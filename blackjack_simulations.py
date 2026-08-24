@@ -83,16 +83,218 @@ def is_soft(hand):
     totals = hand_totals(hand)
 
     return any(
-        total <= 21 and total != min(totals) # As if there is the option for more than one total than there must be an ace, and it is soft if tne greater value is less than or equal to 21
+        total <= 21 and total != min(totals) # As if there is the option for more than one total than there must be an ace, and it is soft if the greater value is less than or equal to 21
         for total in totals
     )
 
+def can_split(hand):
+
+    return (len(hand) == 2 and hand[0].value == hand[1].value) # Can only split when you have two cards in your hand and when the value of the cards is the same. Does allow for Queen-10 splitting, as both are valued at 10.
+
+def should_split(hand, dealer_upcard):
+
+    if not can_split(hand):
+        return False
+
+    dealer_value = dealer_upcard.value # Here we are calling the delaer up  card value as dealer_value so all face cards and 10s are looked at by the same case
+    player_value = hand[0].value # Due to the fact that we can only split pairs of equal values, the player_value is the value of each card
+
+    if hand[0] == ace and hand[1] == ace: # Always split Aces
+        return True
+
+    if player_value == 10: # Never split 10s
+        return False
+
+    if player_value == 9: # We should split 9s if the upcard is one of the following
+        return dealer_value in [2, 3, 4, 5, 6, 8, 9]
+
+    if player_value == 8: # Always split 8s
+        return True
+
+    if player_value == 7: # Should split 7s against dealers 2 to 7
+        return 2 <= dealer_value <= 7
+
+    if player_value == 6: # Here DAS is allowed so we include splitting after 2s, as well as the rest
+        return 2 <= dealer_value <= 6
+
+    if player_value == 5: # Never split 5s
+        return False
+
+    if player_value == 4: # As DAS is allowed, split against 5 and 6
+        return dealer_value in [5, 6]
+
+    if player_value in [2, 3]: # 2s and 3s have the same splits, where against 2 to 7 with DAS
+        return 2 <= dealer_value <= 7
+
+    return False # Otherwise do not split
+
+def play_player_hand(shoe, hand, dealer_up, bankroll, hand_bet, committed):
+
+    if(should_split(hand, dealer_up) and bankroll - committed >= hand_bet): # Check that we can both split and have the bankroll to facilitate it
+
+        committed += hand_bet # Placing a new bet for the new hand
+        
+        hand1 = [hand[0]] # Split the original pair into two seperate hands
+        hand2 = [hand[1]]
+
+        hand1.append(shoe.pop()) # Deal a card to each hand 
+        hand2.append(shoe.pop())
+
+        if hand[0] == ace: # When splitting aces you receive one card and are forced to stand, cannot resplit
+            return [(hand1, hand_bet), (hand2, hand_bet)], committed
+            
+        hands1, committed = play_player_hand(shoe, hand1, dealer_up, bankroll, hand_bet, committed) # Play hand1 recursively
+        hands2, committed = play_player_hand(shoe, hand2, dealer_up, bankroll, hand_bet, committed) # Play hand2 recursively
+
+        return hands1 + hands2, committed
+    
+    while True:
+
+        current_total = best_total(hand)
+        dealer_value = dealer_up.value
+
+        if current_total > 21:
+            return [(hand, hand_bet)], committed # Busts
+
+        if is_soft(hand): # If hand is soft, do the following
+
+            if 13 <= current_total <= 14:
+
+                if (5 <= dealer_value <= 6 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                else:
+                    hand.append(shoe.pop()) # Hit as not enough bankroll to double
+
+
+            elif 15 <= current_total <= 16:
+
+                if (
+                    4 <= dealer_value <= 6 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                else:
+                    hand.append(shoe.pop()) # Hit as not enough bankroll to double
+
+
+            elif current_total == 17:
+
+                if (3 <= dealer_value <= 6 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                else:
+                    hand.append(shoe.pop()) # Hit as not enough bankroll to double
+
+
+            elif current_total == 18:
+
+                if (2 <= dealer_value <= 6 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                elif 7 <= dealer_value <= 8:
+                    hand.append(shoe.pop()) # Hit
+
+                else:
+                    return [(hand, hand_bet)], committed # Stand (as not enough bankroll to double)
+
+
+            elif current_total == 19:
+
+                if (dealer_value == 6 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+
+                return [(hand, hand_bet)], committed # Stand as not enough bankroll to double
+
+
+            else:
+                return [(hand, hand_bet)], committed # Stand
+
+        else: # If hand is hard, do the following
+
+            if current_total <= 8: # Hit
+                hand.append(shoe.pop())
+
+
+            elif current_total == 9:
+
+                if (3 <= dealer_value <= 6 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                else:
+                    hand.append(shoe.pop()) # Hit (as not enough bankroll to double)
+
+
+            elif current_total == 10:
+
+                if (2 <= dealer_value <= 9 and bankroll - committed >= hand_bet):
+                    committed += hand_bet # Double
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                else:
+                    hand.append(shoe.pop()) # Hit (as not enough bankroll to double)
+
+
+            elif current_total == 11:
+
+                if bankroll - committed >= hand_bet: # Double
+                    committed += hand_bet
+                    hand_bet *= 2
+                    hand.append(shoe.pop())
+                    return [(hand, hand_bet)], committed
+
+                else:
+                    hand.append(shoe.pop()) # Hit (as not enough bankroll to double)
+
+
+            elif current_total == 12:
+
+                if 4 <= dealer_value <= 6:
+                    return [(hand, hand_bet)], committed
+
+                hand.append(shoe.pop()) # Hit
+
+
+            elif 13 <= current_total <= 16:
+
+                if dealer_value <= 6:
+                    return [(hand, hand_bet)], committed
+
+                hand.append(shoe.pop()) # Hit
+
+
+            else:
+                return [(hand, hand_bet)], committed # Stand
+
 def play_hand(shoe, bankroll, bet=1):
+
+    if bankroll < bet: # Need to have the money left to bet
+        return bankroll
+
+    committed = bet
 
     player = [shoe.pop(), shoe.pop()]
     dealer = [shoe.pop(), shoe.pop()]
 
-    player_up = dealer[0]
+    dealer_up = dealer[0]
 
     player_blackjack = (len(player) == 2 and best_total(player) == 21) # Hence player has blackjack
     dealer_blackjack = (len(dealer) == 2 and best_total(dealer) == 21) # Hence dealer has blackjack
@@ -106,175 +308,15 @@ def play_hand(shoe, bankroll, bet=1):
     if dealer_blackjack:
         return bankroll - bet # As only dealer has blackjack, player will lose, even if they eventually get 21
 
-    while True:
+    final_hands, committed = play_player_hand(shoe, player, dealer_up, bankroll, bet, committed) # Player plays, splits can only happen now so if split Aces leads to 21, will just pay out 1:1
 
-        totals = hand_totals(player)
-        current_total = best_total(player)
-        dealer_value = player_up.value
-
-        # If player has busted, lose immediately
-        if current_total > 21:
-            return bankroll - bet
-
-        if is_soft(player): # Hand is soft
-
-            if 13 <= current_total <= 14 and 5 <= dealer_value <= 6:
-                # DOUBLE
-                bankroll -= bet # Better to have doubling in the function as avoids having to use global variables, same with standing and hitting
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif 13 <= current_total <= 14:
-                player.append(shoe.pop())
-
-            elif 15 <= current_total <= 16 and 4 <= dealer_value <= 6:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif 15 <= current_total <= 16:
-                player.append(shoe.pop())
-
-            elif current_total == 17 and 3 <= dealer_value <= 6:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif current_total == 17:
-                player.append(shoe.pop())
-
-            elif current_total == 18 and 2 <= dealer_value <= 6:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif current_total == 18 and 7 <= dealer_value <= 8:
-                player.append(shoe.pop())
-
-            elif current_total == 18:
-                # STAND
-                break
-
-            elif current_total == 19 and dealer_value == 6:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            else:
-                # STAND
-                break
-
-        else: # Hand is hard
-
-            if current_total <= 8:
-                # HIT
-                player.append(shoe.pop())
-
-            elif current_total == 9 and 3 <= dealer_value <= 6:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif current_total == 9:
-                # HIT
-                player.append(shoe.pop())
-
-            elif current_total == 10 and 2 <= dealer_value <= 9:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif current_total == 10:
-                # HIT
-                player.append(shoe.pop())
-
-            elif current_total == 11:
-                # DOUBLE
-                bankroll -= bet
-                bet *= 2
-
-                player.append(shoe.pop())
-
-                if best_total(player) > 21:
-                    return bankroll - bet
-
-                break
-
-            elif current_total == 12 and 4 <= dealer_value <= 6:
-                # STAND
-                break
-
-            elif current_total == 12:
-                # HIT
-                player.append(shoe.pop())
-
-            elif 13 <= current_total <= 16 and dealer_value <= 6:
-                # STAND
-                break
-
-            elif 13 <= current_total <= 16:
-                # HIT
-                player.append(shoe.pop())
-
-            else:
-                # 17+
-                break
-
-    while True: # Now what the dealer has to do
+    while True: # Now dealer plays
 
         dealer_total = best_total(dealer)
 
         # Dealer busts
         if dealer_total > 21:
-            return bankroll + bet
+            break
 
         # Dealer stands on 17+
         if dealer_total >= 17:
@@ -283,16 +325,28 @@ def play_hand(shoe, bankroll, bet=1):
         # Dealer hits
         dealer.append(shoe.pop())
 
-    player_total = best_total(player) # Comparing hands
-    dealer_total = best_total(dealer)
+    for hand, hand_bet in final_hands: # Compare dealer's hand against however mand hands the player has due to splits
 
-    if player_total > dealer_total:
-        bankroll += bet
+        player_total = best_total(hand)
+        dealer_total = best_total(dealer)
 
-    elif player_total < dealer_total:
-        bankroll -= bet
+        # Player busts
+        if player_total > 21:
+            bankroll -= hand_bet
 
-    # Otherwise even so nothing happens
+        # Dealer busts
+        elif dealer_total > 21:
+            bankroll += hand_bet
+
+        # Player wins
+        elif player_total > dealer_total:
+            bankroll += hand_bet
+
+        # Player loses
+        elif player_total < dealer_total:
+            bankroll -= hand_bet
+
+        # Draw: bankroll unchanged
 
     return bankroll
 
@@ -310,7 +364,7 @@ def simulation(number_of_hands=1000, starting_money=100, number_of_decks=6, cut_
             break
 
         # Re-shuffle when reaching the cut-card point
-        if len(shoe) < cut_cards:
+        if len(shoe) < number_of_decks*52 - cut_cards:
             shoe = new_shoe(number_of_decks)
 
         bankroll = play_hand(shoe, bankroll, bet=1)
@@ -343,7 +397,39 @@ def run_simulations(number_of_simulations=100000, number_of_hands=1000):
 
     return profits
 
-profits = run_simulations(100000, 1000)
+profits = run_simulations(1000, 100) # Simulating 1000, 100 length hands
+plt.hist(profits, bins=50)
+plt.xlabel("Profit / Loss")
+plt.ylabel("Number of simulations")
+plt.title("Distribution of Profit/Loss after 100 Blackjack Hands")
+plt.show()
+
+print("Mean profit:", np.mean(profits))
+print("Median profit:", np.median(profits))
+print("Standard deviation:", np.std(profits))
+print("Best result:", max(profits))
+print("Worst result:", min(profits))
+print("Probability of profit:", np.mean(np.array(profits) > 0))
+print("Probability of loss:", np.mean(np.array(profits) < 0))
+print("Probability of bust:", np.mean(np.array(profits) == -100))
+
+profits = run_simulations(10000, 1000) # Simulating 10000, 1000 length hands
+plt.hist(profits, bins=50)
+plt.xlabel("Profit / Loss")
+plt.ylabel("Number of simulations")
+plt.title("Distribution of Profit/Loss after 1,000 Blackjack Hands")
+plt.show()
+
+print("Mean profit:", np.mean(profits))
+print("Median profit:", np.median(profits))
+print("Standard deviation:", np.std(profits))
+print("Best result:", max(profits))
+print("Worst result:", min(profits))
+print("Probability of profit:", np.mean(np.array(profits) > 0))
+print("Probability of loss:", np.mean(np.array(profits) < 0))
+print("Probability of bust:", np.mean(np.array(profits) == -100))
+
+profits = run_simulations(100000, 1000) # Simulating 100000, 100 length hands
 plt.hist(profits, bins=50)
 plt.xlabel("Profit / Loss")
 plt.ylabel("Number of simulations")
