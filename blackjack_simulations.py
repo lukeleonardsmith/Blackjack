@@ -438,7 +438,7 @@ plt.hist(profits, bins=50)
 plt.xlabel("Profit / Loss")
 plt.ylabel("Number of simulations")
 plt.title("Distribution of Profit/Loss after 1,000 Blackjack Hands")
-plt.savefig("images/profit_distribution_100000_1000).png", dpi=300, bbox_inches="tight")
+plt.savefig("images/profit_distribution_100000_1000.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 print("Mean profit:", np.mean(profits))
