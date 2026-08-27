@@ -402,6 +402,7 @@ plt.hist(profits, bins=50)
 plt.xlabel("Profit / Loss")
 plt.ylabel("Number of simulations")
 plt.title("Distribution of Profit/Loss after 100 Blackjack Hands")
+plt.savefig("images/profit_distribution(1000,100).png", dpi=300, bbox_inches="tight")
 plt.show()
 
 print("Mean profit:", np.mean(profits))
@@ -418,6 +419,7 @@ plt.hist(profits, bins=50)
 plt.xlabel("Profit / Loss")
 plt.ylabel("Number of simulations")
 plt.title("Distribution of Profit/Loss after 1,000 Blackjack Hands")
+plt.savefig("images/profit_distribution(1000,1000).png", dpi=300, bbox_inches="tight")
 plt.show()
 
 print("Mean profit:", np.mean(profits))
@@ -429,11 +431,12 @@ print("Probability of profit:", np.mean(np.array(profits) > 0))
 print("Probability of loss:", np.mean(np.array(profits) < 0))
 print("Probability of bust:", np.mean(np.array(profits) == -100))
 
-profits = run_simulations(100000, 1000) # Simulating 100000, 100 length hands
+profits = run_simulations(100000, 1000) # Simulating 100000, 1000 length hands
 plt.hist(profits, bins=50)
 plt.xlabel("Profit / Loss")
 plt.ylabel("Number of simulations")
 plt.title("Distribution of Profit/Loss after 1,000 Blackjack Hands")
+plt.savefig("images/profit_distribution(100000,1000).png", dpi=300, bbox_inches="tight")
 plt.show()
 
 print("Mean profit:", np.mean(profits))
