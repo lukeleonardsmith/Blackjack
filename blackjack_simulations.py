@@ -1,6 +1,8 @@
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+os.makedirs("images", exist_ok=True)
 
 class cards(object):
 
