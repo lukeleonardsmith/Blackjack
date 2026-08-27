@@ -117,6 +117,8 @@ def deal_card_to_hand(hand_index):
 def hit(hand_index):
     hand = playerhands[hand_index]
 
+    print("\n")
+    
     if hand["split_aces"]:
         print("You cannot hit after splitting aces")
         return
@@ -138,6 +140,7 @@ def hit(hand_index):
 
 def stand(hand_index):
 
+    print("\n")
     playerhands[hand_index]["finished"] = True
     print('You stand on Hand', hand_index + 1)
 
@@ -191,6 +194,8 @@ def double(hand_index):
 
     hand = playerhands[hand_index]
 
+    print("\n")
+    
     if len(hand["cards"]) != 2: # can only double with two cards in hand
         print("You can only double on your first two cards.")
         player_move(hand_index)
@@ -256,6 +261,7 @@ def split(hand_index):
 
     playerhands.insert(hand_index + 1, hand2) # Insert the second hand after it, indexing allows multiple splits
 
+    print("\n")
     deal_card_to_player(hand_index) # Deal one card to both new hands
     deal_card_to_player(hand_index + 1)
 
@@ -416,6 +422,7 @@ def resolve_hands():
             print('Draw.')
 
     print('\nYou have:', money, 'money left.')
+    print('\n')
 
 def basic_strategy(hand_index):
 
@@ -428,6 +435,8 @@ def basic_strategy(hand_index):
     if dealer_value == 11:
         dealer_value = 11
 
+    print("\n")
+    
     if len(cards) == 2 and not hand["split_aces"]: # Check if hand should be split
         card1 = cards[0]
         card2 = cards[1]
