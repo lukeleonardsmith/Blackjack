@@ -80,6 +80,7 @@ def roundstart(b):
         print('We have reached the cutcard. Now the playing deck is reset.')
         playingdeck = n_deck(decknumbers)
         gamestart(money, decknumbers, cutinfo)
+        roundstart(hand["bet"])
         return
 
     print('You have: ' + str(money) + ' money left.')
@@ -320,6 +321,7 @@ def player_move(hand_index):
 
     elif command == "basic strategy":
         basic_strategy(hand_index)
+        player_move(hand_index)
 
     else:
         print('That is not a valid command.')
