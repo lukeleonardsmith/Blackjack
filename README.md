@@ -44,7 +44,7 @@ The project models a player's decisions, hitting, standing, doubling, or splitti
  - Probability of loss = 0.5284
  - Probability of bust = 0.004460
 
-The same data has been gathered for Simulations of 1000 hands of 1000 turns and 1000 hands of 100 turns and are noted in the file named data. 
+The same data has been gathered for Simulations of 1000 hands of 1000 turns and 1000 hands of 100 turns and are noted in the file named data.md. 
 
 # Blackjack Game
 
