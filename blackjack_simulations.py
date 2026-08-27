@@ -31,21 +31,7 @@ jack = cards('jack', 10)
 queen = cards('queen', 10)
 king = cards('king', 10)
 
-deck = (
-    [ace] * 4 +
-    [two] * 4 +
-    [three] * 4 +
-    [four] * 4 +
-    [five] * 4 +
-    [six] * 4 +
-    [seven] * 4 +
-    [eight] * 4 +
-    [nine] * 4 +
-    [ten] * 4 +
-    [jack] * 4 +
-    [queen] * 4 +
-    [king] * 4
-)
+deck = ([ace] * 4 + [two] * 4 + [three] * 4 + [four] * 4 + [five] * 4 + [six] * 4 + [seven] * 4 + [eight] * 4 + [nine] * 4 + [ten] * 4 + [jack] * 4 + [queen] * 4 + [king] * 4)
 
 def new_shoe(number_of_decks):
 
@@ -84,10 +70,7 @@ def is_soft(hand):
 
     totals = hand_totals(hand)
 
-    return any(
-        total <= 21 and total != min(totals) # As if there is the option for more than one total than there must be an ace, and it is soft if the greater value is less than or equal to 21
-        for total in totals
-    )
+    return any(total <= 21 and total != min(totals) for total in totals) # As if there is the option for more than one total than there must be an ace, and it is soft if the greater value is less than or equal to 21
 
 def can_split(hand):
 
