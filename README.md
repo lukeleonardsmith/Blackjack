@@ -27,7 +27,7 @@ The project models a player's decisions, hitting, standing, doubling, or splitti
 
  ## Results
  
- From runinng the project, here is a collection of results:
+ From running the project, here is a collection of results:
 
  ### Simulation of 100,000 hands of length 1000
  
@@ -39,7 +39,7 @@ The project models a player's decisions, hitting, standing, doubling, or splitti
  - Median profit = -3.000
  - Standard deviation = 37.31
  - Best result = 151
- - Worst resilt = -100
+ - Worst result = -100
  - Probability of profit = 0.4662
  - Probability of loss = 0.5284
  - Probability of bust = 0.004460
@@ -48,10 +48,10 @@ The same data has been gathered for Simulations of 1000 hands of 1000 turns and 
 
 # Blackjack Game
 
-This game is set up with the sme rules that governed the simulation, but the code itself is different due to allowing human input rather than being fully self contained.
+This game is set up with the same rules that govern the simulation, but the code itself is different due to allowing human input rather than being fully self contained.
 
 ## Features
-- Start with a bankroll of 100 with a fixed betsize of 1
+- Start with a bankroll of 100 with a fixed bet size of 1
 - Ability to hit, stand, double and split
 - Can choose to see basic strategy recommendation
 
