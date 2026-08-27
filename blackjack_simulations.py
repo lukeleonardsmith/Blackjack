@@ -1,7 +1,6 @@
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 
 class cards(object):
 
@@ -403,7 +402,6 @@ plt.hist(profits, bins=50)
 plt.xlabel("Profit / Loss")
 plt.ylabel("Number of simulations")
 plt.title("Distribution of Profit/Loss after 100 Blackjack Hands")
-os.makedirs("images", exist_ok=True)
 plt.savefig("images/profit_distribution_1000_100.png", dpi=300, bbox_inches="tight")
 plt.show()
 
