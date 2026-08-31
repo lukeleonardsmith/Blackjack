@@ -4,11 +4,11 @@ Two Python projects, one that lets the user play a game of blackjack, the other 
 
 # Blackjack Strategy Simulator
 
-The project models a player's decisions, hitting, standing, doubling, or splitting, all in accordance to a basic strategy lookup table. Variations on hand length and number of simulations are conducted, providing insight into the resulting profit and loss. 
+The project models a player's decisions, hitting, standing, doubling, or splitting, all in accordance to a predifined basic strategy lookup table. Variations on hand length and number of simulations are conducted, providing insight into the resulting profit and loss. 
 
 ## Rules of this game
 
-- Two deck shoe
+- Six deck shoe
 - Cut card is one deck deep
 - Dealer stands on 17
 - DAS is allowed
@@ -35,16 +35,20 @@ The project models a player's decisions, hitting, standing, doubling, or splitti
 
  After this simulation, the above histogram shows the profit attained after 1000 turns, and more detailed statistics are below (4sf):
 
- - Mean profit = -2.921
- - Median profit = -3.000
- - Standard deviation = 37.31
- - Best result = 151
- - Worst result = -100
- - Probability of profit = 0.4662
- - Probability of loss = 0.5284
- - Probability of bust = 0.004460
+| Statistic             |  Results|  |  |
+| --------------------- | ------: |------:|------:|
+| Simulations           | 100,000 | 1,000 | 1,000 |
+| Hands per simulation  | 1,000 | 1,000 | 100 |
+| Starting bankroll     | 100 | 100 | 100 |
+| Mean profit           | -2.921 | -3.401 | -0.029 |
+| Median profit         | -3.000 | -3.500 | 0.000 |
+| Standard deviation    | 37.31 | 37.59 | 11.90 |
+| Probability of profit | 46.62% | 46.01% | 49.00% |
+| Probability of loss   | 52.84% | 53.55% | 51.00% |
+| Probability of bust   | 0.446% | 0.440% | 0% |
+| Best profit           | 151 | 149.5 | 35.5 |
+| Worst profit          | -100 | -100 | -41 |
 
-The same data has been gathered for Simulations of 1000 hands of 1000 turns and 1000 hands of 100 turns and are noted in the file named data.md. 
 
 # Blackjack Game
 
